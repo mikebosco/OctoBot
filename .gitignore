@@ -1,0 +1,10 @@
+searchapi/bin
+searchapi/obj
+*.user
+*.suo
+_ReSharper.*
+*.sln.cache
+[Pp]ackages/
+[Bb]in/
+[Oo]bj/
+!/lib
