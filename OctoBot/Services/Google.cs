@@ -31,7 +31,20 @@ namespace OctoBot.Services
 
             return "Whoa! Error in program logic... exiting gracefully";
 
-        } // end of constructor
+        } // end of search
+
+        static public string ImageSearch(string query)
+        {
+            GimageSearchClient gimage = new GimageSearchClient("http://ubound.hipchat.com");
+
+            var results = gimage.Search(query, 1);
+            foreach (var result in results)
+            {
+                return result.Url;
+            }
+            return string.Empty;
+          
+        }
 
     }
 }

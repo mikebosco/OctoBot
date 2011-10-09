@@ -58,31 +58,6 @@ namespace OctoBot
 
         #region "Constructor"
 
-        public HipChatService()
-        {
-            // setup the bot with defaults
-            OPERATION_ACTIVE = false;
-
-
-            theClient = new HipChatClient(APIKEY, HIPCHATROOM, HIPCHATUSERNAME);
-            ticker.Elapsed += new ElapsedEventHandler(getChatHistory);
-            ticker.Interval = 60000;
-
-            try
-            {
-                //theClient.SendMessage("Octobot online...");
-                Console.WriteLine(DateTime.Now + "[Chat] Initialized");
-                parseRoomHistory(theClient.ListHistoryAsNativeObjects());
-                CHAT_INITERFACE_ACTIVE = true;
-            }
-            catch 
-            {
-                Console.WriteLine(DateTime.Now + "[CHAT] Unable to initialize");
-                CHAT_INITERFACE_ACTIVE = false;
-            }
-
-        }
-
         public HipChatService(string setAPIKEY)
         {
             APIKEY = setAPIKEY;
@@ -128,8 +103,6 @@ namespace OctoBot
             if (OPERATION_ACTIVE == false)
             {
                 OPERATION_ACTIVE = true;
-                theClient.SendMessage("tick!");
-                //parseRoomHistory(theClient.RoomHistory(DateTime.Now));
                 parseRoomHistory(theClient.ListHistoryAsNativeObjects());
                 OPERATION_ACTIVE = false;
             }
@@ -150,17 +123,18 @@ namespace OctoBot
         {
             foreach (var msg in Messages)
             {
-                if (msg.Text == "!Octobot")
+                msg.Text = msg.Text.ToLower();
+                if (msg.Text == "@octobot" || msg.Text == "@Octobot")
                 {
                     if (checkIfCommandIssued(msg) == false && FIRSTRUN == false)
                     {
-                        theClient.SendMessage("Can I help you " + msg.From.Name + "?");
+                        theClient.SendMessage("(troll) Can I help you " + msg.From.Name + "?");
                     }
                     // now that the command was sent, add it to the issued commands list
                     addToIssuedCommands(msg);
                     
                 }
-                else if (msg.Text.Contains("!Octobot @google"))
+                else if (msg.Text.Contains("@octobot search"))
                 {
                     if (checkIfCommandIssued(msg) == false && FIRSTRUN == false)
                     {
@@ -171,6 +145,42 @@ namespace OctoBot
                     // add it to the list
                     addToIssuedCommands(msg);
                 }
+                else if (msg.Text.Contains("@octobot image"))
+                {
+                    if (checkIfCommandIssued(msg) == false && FIRSTRUN == false)
+                    {
+                        string searchQuery = msg.Text.Substring(14);
+                        theClient.SendMessage(Services.Gbot.ImageSearch(searchQuery));
+                    }
+                    // add it to the list
+                    addToIssuedCommands(msg);
+                }
+
+                else if (msg.Text == "@octobot refresh")
+                {
+                    if (checkIfCommandIssued(msg) == false && FIRSTRUN == false)
+                    {
+                        FIRSTRUN = true;
+                        OperationsList.Clear();
+                        parseRoomHistory(theClient.ListHistoryAsNativeObjects());
+                        FIRSTRUN = false;
+                        theClient.SendMessage("Ok boss, I've retallied my actions. Sorry for being annoying.");
+                    }
+                    // add it to the list
+                    addToIssuedCommands(msg);
+                }
+                else if (msg.Text.Contains("@octobot define"))
+                {
+                    if (checkIfCommandIssued(msg) == false && FIRSTRUN == false)
+                    {
+                        Services.Gbot gbot = new Services.Gbot();
+                        string searchQuery = msg.Text.Substring(15);
+                        theClient.SendMessage(gbot.Search("define: " + searchQuery));
+                    }
+                    // add it to the list
+                    addToIssuedCommands(msg);
+                }
+
 
             }
                
@@ -189,7 +199,8 @@ namespace OctoBot
 
             foreach (var completeOperation in OperationsList)
             {
-                if (op.userId == completeOperation.userId && op.date == completeOperation.date && op.command == completeOperation.command)
+                if (op.userId == completeOperation.userId && op.date == completeOperation.date 
+                    && op.command == completeOperation.command)
                 {
                     return true;
                 }
