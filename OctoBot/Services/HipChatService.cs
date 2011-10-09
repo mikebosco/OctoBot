@@ -29,20 +29,22 @@ namespace OctoBot
 
         static HipChatClient theClient;
 
-        static List<string> OperationsList;
 
         static Timer ticker = new Timer();
 
+        // not implemented yet
+
+        //static List<string> OperationsList;
 
         // Data Structures for BOT AI
-        private struct knownUsers
-        {
-            string userName;
-            int userId;
-        }
+        //private struct knownUsers
+        //{
+        //    string userName;
+        //    int userId;
+        //}
 
         //in list format
-        static List<knownUsers> userList;
+        //static List<knownUsers> userList;
 
 
 
@@ -147,6 +149,12 @@ namespace OctoBot
             {
                 theClient.SendMessage("What?");
             }
+            else if (responseBody.Contains("!Octobot @google"))
+            {
+                Services.Gbot gbot = new Services.Gbot();
+                //gbot.Search(this.); implement after the room history is parsed as a data structure
+            }
+
         }
 
 
